@@ -34,6 +34,7 @@ import org.talend.core.model.properties.ProcessItem;
 import org.talend.core.model.properties.Property;
 import org.talend.core.runtime.process.LastGenerationInfo;
 import org.talend.core.runtime.process.TalendProcessOptionConstants;
+import org.talend.core.service.ITaCoKitDependencyService;
 import org.talend.core.ui.ITestContainerProviderService;
 import org.talend.designer.maven.utils.PomUtil;
 import org.talend.designer.maven.utils.SortableDependency;
@@ -50,9 +51,16 @@ public class ProcessorDependenciesManager {
 
     private final Property property;
 
+    private final ITaCoKitDependencyService tckService;
+
     public ProcessorDependenciesManager(IProcessor processor) {
         this.processor = processor;
         property = processor.getProperty();
+        if (GlobalServiceRegister.getDefault().isServiceRegistered(ITaCoKitDependencyService.class)) {
+            tckService = GlobalServiceRegister.getDefault().getService(ITaCoKitDependencyService.class);
+        } else {
+            tckService = null;
+        }
     }
 
     /**
@@ -61,10 +69,30 @@ public class ProcessorDependenciesManager {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public boolean updateDependencies(IProgressMonitor progressMonitor, Model model) throws ProcessorException {
         try {
+            Set<ModuleNeeded> jobModules = new HashSet<>();
+            Set<ModuleNeeded> testcaseModules = new HashSet<>();
+            //
+            if (tckService != null && tckService
+                    .hasTaCoKitComponents(tckService.getJobComponents(property.getItem()))) {
+                final Set<String> depsonly = tckService
+                        .getTaCoKitOnlyDependencies(tckService.getJobComponents(property.getItem()));
+                for (ModuleNeeded module : getProcessNeededModules()) {
+                    if (depsonly.stream().noneMatch(dep -> dep.equals(module.getModuleName()))) {
+                        jobModules.add(module);
+                    }
+                }
+                for (ModuleNeeded module : getTestcaseNeededModules(property)) {
+                    if (depsonly.stream().noneMatch(dep -> dep.equals(module.getModuleName()))) {
+                        testcaseModules.add(module);
+                    }
+                }
+            } else {
+                jobModules = getProcessNeededModules();
+                testcaseModules = getTestcaseNeededModules(property);
+            }
+            //
             Set<ModuleNeeded> neededLibraries = new HashSet<>();
             Set<String> uniqueDependencies = new HashSet<>();
-            Set<ModuleNeeded> jobModules = getProcessNeededModules();
-            Set<ModuleNeeded> testcaseModules = getTestcaseNeededModules(property);
             neededLibraries.addAll(jobModules);
             neededLibraries.addAll(testcaseModules);
             if (!neededLibraries.isEmpty()) {
