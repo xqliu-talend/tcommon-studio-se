@@ -52,6 +52,11 @@ public interface ITalendProcessJavaProject {
     IFolder getExternalResourcesFolder();
 
     /**
+     * src/main/tacokit-resources as external resources folder
+     */
+    IFolder getTaCoKitResourcesFolder();
+
+    /**
      * src/main/resources as internal resources folder
      */
     IFolder getResourcesFolder();
