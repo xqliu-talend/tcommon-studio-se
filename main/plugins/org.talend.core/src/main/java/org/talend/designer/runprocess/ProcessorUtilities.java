@@ -1446,13 +1446,15 @@ public class ProcessorUtilities {
                     }
                     while (relativepath.hasNext()) {
                         String relativePath = relativepath.next();
-                        Set<URL> sources = resouece.getResourcesByRelativePath(relativePath);
-                        for (URL sourceUrl : sources) {
-                            File currentResource = new File(
-                                    org.talend.commons.utils.io.FilesUtils.getFileRealPath(sourceUrl.getPath()));
-                            if (currentResource.exists()) {
-                                FilesUtils.copyDirectory(currentResource, new File(
-                                        targetFolder.getLocation().toPortableString() + File.separator + pathStr));
+                        if (!(relativePath.startsWith("MAVEN-INF") || relativePath.startsWith("TALEND-INF"))) {
+                            Set<URL> sources = resouece.getResourcesByRelativePath(relativePath);
+                            for (URL sourceUrl : sources) {
+                                File currentResource = new File(
+                                        org.talend.commons.utils.io.FilesUtils.getFileRealPath(sourceUrl.getPath()));
+                                if (currentResource.exists()) {
+                                    FilesUtils.copyDirectory(currentResource, new File(
+                                            targetFolder.getLocation().toPortableString() + File.separator + pathStr));
+                                }
                             }
                         }
                     }
