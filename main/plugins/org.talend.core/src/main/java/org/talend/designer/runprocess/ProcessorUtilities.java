@@ -78,6 +78,7 @@ import org.talend.core.model.components.EComponentType;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.model.components.IComponentsFactory;
 import org.talend.core.model.components.IComponentsService;
+import org.talend.core.model.context.ContextUtils;
 import org.talend.core.model.general.ModuleNeeded;
 import org.talend.core.model.general.Project;
 import org.talend.core.model.metadata.IMetadataColumn;
@@ -1006,6 +1007,7 @@ public class ProcessorUtilities {
                     if (context.getName().equals(currentContext.getName())) {
                         // override parameter value before generate current context
                         IContext checkedContext = checkNeedOverrideContextParameterValue(currentContext, jobInfo);
+                        checkedContext = checkCleanSecureContextParameterValue(checkedContext, jobInfo);
                         processor.setContext(checkedContext); // generate current context.
                     } else {
                         processor.setContext(context);
@@ -1074,6 +1076,26 @@ public class ProcessorUtilities {
                 } else {
                     contextParameter.setValue(overrideParameter.getValue());
                 }
+            }
+        }
+        return context;
+    }
+	
+    private static IContext checkCleanSecureContextParameterValue(IContext currentContext, JobInfo jobInfo) {
+        if (jobInfo.getArgumentsMap() == null
+                || jobInfo.getArgumentsMap().get(TalendProcessArgumentConstant.ARG_CLEAR_PASSWORD_CONTEXT_PARAMETERS) == null 
+                    || !Boolean.parseBoolean((ProcessUtils.getOptionValue(jobInfo.getArgumentsMap(), TalendProcessArgumentConstant.ARG_CLEAR_PASSWORD_CONTEXT_PARAMETERS,
+                        (String) null)))) {
+            return currentContext;
+        }
+        
+        IContext context = currentContext.clone();
+
+        List<IContextParameter> contextParameterList = context.getContextParameterList();
+        for (IContextParameter contextParameter : contextParameterList) {
+            if (PasswordEncryptUtil.isPasswordType(contextParameter.getType()) 
+                || ContextUtils.isSecureSensitiveParam(contextParameter.getName())) {
+                    contextParameter.setValue("");
             }
         }
         return context;
