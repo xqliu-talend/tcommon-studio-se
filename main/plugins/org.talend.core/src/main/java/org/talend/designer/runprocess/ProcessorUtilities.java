@@ -1082,10 +1082,13 @@ public class ProcessorUtilities {
     }
 	
     private static IContext checkCleanSecureContextParameterValue(IContext currentContext, JobInfo jobInfo) {
-        if (jobInfo.getArgumentsMap() == null
-                || jobInfo.getArgumentsMap().get(TalendProcessArgumentConstant.ARG_CLEAR_PASSWORD_CONTEXT_PARAMETERS) == null 
-                    || !Boolean.parseBoolean((ProcessUtils.getOptionValue(jobInfo.getArgumentsMap(), TalendProcessArgumentConstant.ARG_CLEAR_PASSWORD_CONTEXT_PARAMETERS,
-                        (String) null)))) {
+        
+        JobInfo job = getRootJob(jobInfo);
+        
+        if (job.getArgumentsMap() == null
+            || job.getArgumentsMap().get(TalendProcessArgumentConstant.ARG_CLEAR_PASSWORD_CONTEXT_PARAMETERS) == null 
+                || !Boolean.parseBoolean((ProcessUtils.getOptionValue(job.getArgumentsMap(), TalendProcessArgumentConstant.ARG_CLEAR_PASSWORD_CONTEXT_PARAMETERS,
+                    (String) null)))) {
             return currentContext;
         }
         
@@ -1099,6 +1102,15 @@ public class ProcessorUtilities {
             }
         }
         return context;
+    }
+
+    private static JobInfo getRootJob(JobInfo jobInfo) {
+    	
+    	if (jobInfo  != null && jobInfo.getFatherJobInfo() != null)  {
+    		return getRootJob(jobInfo.getFatherJobInfo());
+        }
+        
+        return  jobInfo;
     }
 
     private static void generateDataSet(IProcess process, IProcessor processor) {
