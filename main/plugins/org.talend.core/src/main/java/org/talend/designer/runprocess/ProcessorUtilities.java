@@ -1083,7 +1083,18 @@ public class ProcessorUtilities {
 	
     private static IContext checkCleanSecureContextParameterValue(IContext currentContext, JobInfo jobInfo) {
         
-        JobInfo job = getRootJob(jobInfo);
+        JobInfo job = null;
+        
+        if (jobInfo.getFatherJobInfo() == null) {
+        	job = jobInfo;
+        } else {
+        	job = getRootJob(jobInfo);
+        	if (job.getProcess() == null || "route".equalsIgnoreCase(job.getProcess().getElementName())) {
+        		// cleanup context only for child jobs which are referenced
+        		// by tRunJob component or for Joblets (see TESB-29718 for details) 
+        		return currentContext;
+        	}
+        }
         
         if (job.getArgumentsMap() == null
             || job.getArgumentsMap().get(TalendProcessArgumentConstant.ARG_CLEAR_PASSWORD_CONTEXT_PARAMETERS) == null 
@@ -2947,6 +2958,13 @@ public class ProcessorUtilities {
             if (p != null) {
                 return ERepositoryObjectType.getType(p).equals(ERepositoryObjectType.PROCESS_ROUTELET);
             }
+        }
+        return false;
+    }
+    
+    public static boolean isJob(Property p) {
+        if (p != null) {
+            return ERepositoryObjectType.getType(p).equals(ERepositoryObjectType.PROCESS);
         }
         return false;
     }
