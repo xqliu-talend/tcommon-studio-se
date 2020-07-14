@@ -2084,6 +2084,11 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
                 // init dynamic distirbution after `beforeLogon`, before loading libraries.
                 initDynamicDistribution(monitor);
 
+                if (GlobalServiceRegister.getDefault().isServiceRegistered(IUpdateService.class)) {
+                    IUpdateService updateService = GlobalServiceRegister.getDefault().getService(IUpdateService.class);
+                    updateService.syncComponentM2Jars(currentMonitor);
+                }
+
                 // init sdk component
                 try {
                     currentMonitor = subMonitor.newChild(1, SubMonitor.SUPPRESS_NONE);
@@ -2151,11 +2156,6 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
                 }
 
                 fireRepositoryPropertyChange(ERepositoryActionName.PROJECT_PREFERENCES_RELOAD.getName(), null, null);
-
-                if (GlobalServiceRegister.getDefault().isServiceRegistered(IUpdateService.class)) {
-                    IUpdateService updateService = GlobalServiceRegister.getDefault().getService(IUpdateService.class);
-                    updateService.syncComponentM2Jars(currentMonitor);
-                }
 
                 IRunProcessService runProcessService = getRunProcessService();
                 if (runProcessService != null) {
