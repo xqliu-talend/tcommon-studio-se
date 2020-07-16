@@ -142,40 +142,51 @@ public class SwitchContextGroupNameImpl implements ISwitchContext {
                 retCode = true;
             } else if (dbType == EDatabaseTypeName.GENERAL_JDBC) {
                 retCode = true;
-            } else {
-                DatabaseConnection dbConn = (DatabaseConnection) conn;
-                boolean hasCatalog = ConnectionHelper.hasCatalog(dbConn);
-                boolean hasSchema = ConnectionHelper.hasSchema(dbConn);
-                ContextType newContextType = ConnectionContextHelper.getContextTypeForContextMode(dbConn, selectedContext, false);
-                ContextType oldContextType = ConnectionContextHelper.getContextTypeForContextMode(dbConn, oldContextName, false);
-                String newSidOrDatabase = ConnectionContextHelper.getOriginalValue(newContextType, dbConn.getSID());
-                String newUiShema = ConnectionContextHelper.getOriginalValue(newContextType, dbConn.getUiSchema());
-                String oldSidOrDatabase = ConnectionContextHelper.getOriginalValue(oldContextType, dbConn.getSID());
-                String oldUiShema = ConnectionContextHelper.getOriginalValue(oldContextType, dbConn.getUiSchema());
-                if (hasCatalog) {// for example mysql
-                    retCode = !isEmptyString(oldSidOrDatabase) && !isEmptyString(newSidOrDatabase);
-                    if (hasSchema) {// for example mssql
-                        retCode &= !isEmptyString(oldUiShema) && !isEmptyString(newUiShema);
-                    }
-                } else if (hasSchema) {// for example oracle
-                    retCode = !isEmptyString(oldUiShema) && !isEmptyString(newUiShema);
-                }
-            }
+			} else {
+				DatabaseConnection dbConn = (DatabaseConnection) conn;
+				boolean hasCatalog = ConnectionHelper.hasCatalog(dbConn);
+				boolean hasSchema = ConnectionHelper.hasSchema(dbConn);
+				ContextType newContextType = ConnectionContextHelper.getContextTypeForContextMode(dbConn,
+						selectedContext, false);
+				ContextType oldContextType = ConnectionContextHelper.getContextTypeForContextMode(dbConn,
+						oldContextName, false);
+				String newSidOrDatabase = ConnectionContextHelper.getOriginalValue(newContextType, dbConn.getSID());
+				String newUiShema = ConnectionContextHelper.getOriginalValue(newContextType, dbConn.getUiSchema());
+				String oldSidOrDatabase = ConnectionContextHelper.getOriginalValue(oldContextType, dbConn.getSID());
+				String oldUiShema = ConnectionContextHelper.getOriginalValue(oldContextType, dbConn.getUiSchema());
+				if (hasCatalog) {// for example mysql
+					retCode = checkEmpty(newSidOrDatabase, oldSidOrDatabase);
+					if (hasSchema) {// for example mssql
+						retCode &= checkEmpty(newUiShema, oldUiShema);
+					}
+				} else if (hasSchema) {// for example oracle
+					retCode = checkEmpty(newUiShema, oldUiShema);
+				}else {//some db didnot have catelog and schema
+					retCode = true;
+				}
+				// Added TDQ-18565
+				if (!retCode && GlobalServiceRegister.getDefault().isServiceRegistered(ITDQRepositoryService.class)) {
+					ITDQRepositoryService tdqRepService = GlobalServiceRegister.getDefault()
+							.getService(ITDQRepositoryService.class);
+					if (!tdqRepService.hasClientDependences(connItem)) {
+						retCode = true;
+					}
+				}
+			}
         } else if (conn instanceof FileConnection) {
             retCode = true;
-        }
-
-        if (!retCode && GlobalServiceRegister.getDefault().isServiceRegistered(ITDQRepositoryService.class)) {
-        	ITDQRepositoryService tdqRepService = GlobalServiceRegister.getDefault()
-                    .getService(ITDQRepositoryService.class);
-         	if (!tdqRepService.hasClientDependences(connItem)) {
-        		retCode = true;
-            }
         }
         
         return retCode;
 
     }
+
+	private boolean checkEmpty(String newSidOrDatabase, String oldSidOrDatabase) {
+		if (isEmptyString(oldSidOrDatabase) && isEmptyString(newSidOrDatabase)) {
+			return true;
+		}
+		return !isEmptyString(oldSidOrDatabase) && !isEmptyString(newSidOrDatabase);
+	}
 
     /**
      *
@@ -192,7 +203,7 @@ public class SwitchContextGroupNameImpl implements ISwitchContext {
         String newUiShema = ConnectionContextHelper.getOriginalValue(newContextType, dbConn.getUiSchema());
         String oldSidOrDatabase = ConnectionContextHelper.getOriginalValue(oldContextType, dbConn.getSID());
         String oldUiShema = ConnectionContextHelper.getOriginalValue(oldContextType, dbConn.getUiSchema());
-        if (!isEmptyString(newSidOrDatabase) && !isEmptyString(oldSidOrDatabase)) {// for example mysql or mssql
+        if (checkEmpty(oldSidOrDatabase, newSidOrDatabase)) {// for example mysql or mssql
             Catalog catalog = CatalogHelper.getCatalog(dbConn, oldSidOrDatabase);
             if (catalog != null) {
                 catalog.setName(newSidOrDatabase);
@@ -205,7 +216,7 @@ public class SwitchContextGroupNameImpl implements ISwitchContext {
                 }
             }
         }
-        if (!isEmptyString(newUiShema) && !isEmptyString(oldUiShema)) {// for example oracle
+        if (checkEmpty(oldUiShema, newUiShema)) {// for example oracle
             Schema schema = SchemaHelper.getSchema(dbConn, oldUiShema);
             if (schema != null) {
                 schema.setName(newUiShema);
