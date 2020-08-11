@@ -62,8 +62,9 @@ public class VersionUtilsTest {
 
     @Test
     public void testGetMojoVersion() throws Exception {
-        testMojoVersion(MojoType.CI_BUILDER, "-SNAPSHOT");
-        testMojoVersion(MojoType.CI_BUILDER, "-M3");
+        // testMojoVersion(MojoType.CI_BUILDER, "-SNAPSHOT");
+        // testMojoVersion(MojoType.CI_BUILDER, "-M3");
+        // only return latest version now
         testMojoVersion(MojoType.CI_BUILDER, "");
     }
 
