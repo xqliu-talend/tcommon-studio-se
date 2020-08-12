@@ -9,9 +9,6 @@
     </parent>
 	<artifactId>studio-components-dependencies</artifactId>
 	<packaging>pom</packaging>
-	<properties>
-		<components.version>0.28.5</components.version>
-	</properties>
 	<repositories>
 		<repository>
 			<id>talend_open</id>
@@ -201,6 +198,11 @@
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.9.14-TALEND</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.9.4</version>
 		</dependency>
 	</dependencies>
 	<build>

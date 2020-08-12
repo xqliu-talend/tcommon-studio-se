@@ -78,6 +78,7 @@ import org.talend.core.model.components.EComponentType;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.model.components.IComponentsFactory;
 import org.talend.core.model.components.IComponentsService;
+import org.talend.core.model.context.ContextUtils;
 import org.talend.core.model.general.ModuleNeeded;
 import org.talend.core.model.general.Project;
 import org.talend.core.model.metadata.IMetadataColumn;
@@ -101,6 +102,7 @@ import org.talend.core.model.properties.Property;
 import org.talend.core.model.relationship.Relation;
 import org.talend.core.model.relationship.RelationshipItemBuilder;
 import org.talend.core.model.repository.ERepositoryObjectType;
+import org.talend.core.model.repository.IRepositoryObject;
 import org.talend.core.model.repository.IRepositoryViewObject;
 import org.talend.core.model.repository.RepositoryManager;
 import org.talend.core.model.repository.job.JobResource;
@@ -1005,6 +1007,7 @@ public class ProcessorUtilities {
                     if (context.getName().equals(currentContext.getName())) {
                         // override parameter value before generate current context
                         IContext checkedContext = checkNeedOverrideContextParameterValue(currentContext, jobInfo);
+                        checkedContext = checkCleanSecureContextParameterValue(checkedContext, jobInfo);
                         processor.setContext(checkedContext); // generate current context.
                     } else {
                         processor.setContext(context);
@@ -1076,6 +1079,49 @@ public class ProcessorUtilities {
             }
         }
         return context;
+    }
+	
+    private static IContext checkCleanSecureContextParameterValue(IContext currentContext, JobInfo jobInfo) {
+        
+        JobInfo job = null;
+        
+        if (jobInfo.getFatherJobInfo() == null) {
+        	job = jobInfo;
+        } else {
+        	job = getRootJob(jobInfo);
+        	if (job.getProcess() == null || "route".equalsIgnoreCase(job.getProcess().getElementName())) {
+        		// cleanup context only for child jobs which are referenced
+        		// by tRunJob component or for Joblets (see TESB-29718 for details) 
+        		return currentContext;
+        	}
+        }
+        
+        if (job.getArgumentsMap() == null
+            || job.getArgumentsMap().get(TalendProcessArgumentConstant.ARG_CLEAR_PASSWORD_CONTEXT_PARAMETERS) == null 
+                || !Boolean.parseBoolean((ProcessUtils.getOptionValue(job.getArgumentsMap(), TalendProcessArgumentConstant.ARG_CLEAR_PASSWORD_CONTEXT_PARAMETERS,
+                    (String) null)))) {
+            return currentContext;
+        }
+        
+        IContext context = currentContext.clone();
+
+        List<IContextParameter> contextParameterList = context.getContextParameterList();
+        for (IContextParameter contextParameter : contextParameterList) {
+            if (PasswordEncryptUtil.isPasswordType(contextParameter.getType()) 
+                || ContextUtils.isSecureSensitiveParam(contextParameter.getName())) {
+                    contextParameter.setValue("");
+            }
+        }
+        return context;
+    }
+
+    private static JobInfo getRootJob(JobInfo jobInfo) {
+    	
+    	if (jobInfo  != null && jobInfo.getFatherJobInfo() != null)  {
+    		return getRootJob(jobInfo.getFatherJobInfo());
+        }
+        
+        return  jobInfo;
     }
 
     private static void generateDataSet(IProcess process, IProcessor processor) {
@@ -1561,6 +1607,10 @@ public class ProcessorUtilities {
                     List<ProcessItem> testsItems =
                             testContainerService.getTestContainersByVersion(jobInfo.getProcessItem());
                     for (ProcessItem testItem : testsItems) {
+                        if (testItem.getProperty().getItem().getState().isDeleted()
+                                && IRunProcessService.get().isExcludeDeletedItems(testItem.getProperty())) {
+                            continue;
+                        }
                         JobInfo subJobInfo = new JobInfo(testItem, testItem.getProcess().getDefaultContext());
                         subJobInfo.setTestContainer(true);
                         subJobInfo.setFatherJobInfo(jobInfo);
@@ -2118,6 +2168,28 @@ public class ProcessorUtilities {
         hasLoopDependency = false;
         mainJobInfo = null;
         return genCode;
+    }
+
+    public static IProcessor generateCode(ProcessItem process, String contextName, boolean statistics, boolean trace,
+                                          boolean applyContextToChildren, int option, IProgressMonitor... monitors) throws ProcessorException {
+        IProgressMonitor monitor = null;
+        if (monitors != null && monitors.length > 0) {
+            monitor = monitors[0];
+        }
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
+        }
+        JobInfo jobInfo = new JobInfo(process, contextName);
+        jobInfo.setApplyContextToChildren(applyContextToChildren);
+        jobList.clear();
+        esbJobs.clear();
+        hasLoopDependency = false;
+        mainJobInfo = null;
+        IProcessor result = generateCode(jobInfo, contextName, statistics, trace, true, option, monitor);
+        jobList.clear();
+        hasLoopDependency = false;
+        mainJobInfo = null;
+        return result;
     }
 
     /**
@@ -2872,6 +2944,35 @@ public class ProcessorUtilities {
 
     public static void setCIMode(boolean isCIMode) {
         ProcessorUtilities.isCIMode = isCIMode;
+    }
+    
+    public static boolean hasRoutelet(ProcessItem prItem, String routelet) {
+        EList<NodeType> nodeList = prItem.getProcess().getNode();
+
+        for (NodeType nodeType : nodeList) {
+            if (nodeType.getComponentName().contentEquals(routelet)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isRoutelet(IRepositoryObject object) {
+        if (object != null) {
+            Property p = object.getProperty();
+            if (p != null) {
+                return ERepositoryObjectType.getType(p).equals(ERepositoryObjectType.PROCESS_ROUTELET);
+            }
+        }
+        return false;
+    }
+    
+    public static boolean isJob(Property p) {
+        if (p != null) {
+            return ERepositoryObjectType.getType(p).equals(ERepositoryObjectType.PROCESS);
+        }
+        return false;
     }
 
 }
