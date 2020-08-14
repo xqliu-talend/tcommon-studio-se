@@ -231,6 +231,13 @@ public class MigrationToolService implements IMigrationToolService {
         int nbMigrationsToDo = 0;
         for (IProjectMigrationTask task : toExecute) {
             MigrationTask mgTask = MigrationUtil.findMigrationTask(done, task);
+            if (mgTask != null) {
+                String taskId = mgTask.getId();
+                if (taskId != null && taskId.endsWith(".repeat")) { //$NON-NLS-1$
+                    MigrationUtil.removeMigrationTaskById(done, taskId);
+                    mgTask = null;
+                }
+            }
             if (mgTask == null && !task.isDeprecated()) {
                 nbMigrationsToDo++;
             }
