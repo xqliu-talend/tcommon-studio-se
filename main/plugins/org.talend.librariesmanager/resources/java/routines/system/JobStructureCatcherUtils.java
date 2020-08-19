@@ -21,12 +21,14 @@
 // ============================================================================
 package routines.system;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 //TODO split to several classes by the level when have a clear requirement or design : job, component, connection
 public class JobStructureCatcherUtils {
@@ -59,8 +61,6 @@ public class JobStructureCatcherUtils {
 
 		public String job_version;
 
-		public Long systemPid = JobStructureCatcherUtils.getPid();
-
 		public boolean current_connector_as_input;
 
 		public String current_connector_type;
@@ -89,6 +89,12 @@ public class JobStructureCatcherUtils {
 		public String status;
 		
 		public LogType log_type;
+		
+		//process uuid
+		public String pid = JobStructureCatcherUtils.getPid();
+				
+		//thread uuid
+		public String tid = ThreadId.get();
 
 		public JobStructureCatcherMessage() {
 		}
@@ -198,14 +204,14 @@ public class JobStructureCatcherUtils {
 		return messagesToSend;
 	}
 
-	public static long getPid() {
+	public static String getPid() {
 		RuntimeMXBean mx = ManagementFactory.getRuntimeMXBean();
-		String[] mxNameTable = mx.getName().split("@");
-		if (mxNameTable.length == 2) {
-			return Long.parseLong(mxNameTable[0]);
-		} else {
-			return Thread.currentThread().getId();
+		String processName = mx.getName();
+		try {
+			return UUID.nameUUIDFromBytes(processName.getBytes("UTF8")).toString();
+		} catch (UnsupportedEncodingException e) {
 		}
+		return null;
 	}
 
 	public void addConnectionMessage4PerformanceMonitor(String current_connector, String sourceId, String sourceLabel,
