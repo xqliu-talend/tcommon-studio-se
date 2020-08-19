@@ -101,8 +101,8 @@
             <type>pom</type>
         </dependency>
 	</dependencies>
-	<profiles>
-		<!-- <profile>
+	<!-- <profiles>
+		<profile>
             <id>official</id> -->
             <build>
                 <plugins>
