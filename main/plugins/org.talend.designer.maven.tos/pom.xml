@@ -102,8 +102,8 @@
         </dependency>
 	</dependencies>
 	<profiles>
-		<profile>
-            <id>official</id>
+		<!-- <profile>
+            <id>official</id> -->
             <build>
                 <plugins>
                     <plugin>
@@ -131,6 +131,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-	</profiles>
+        <!-- </profile>
+	</profiles> -->
 </project>
