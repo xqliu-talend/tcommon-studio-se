@@ -3075,7 +3075,7 @@ public class LocalRepositoryFactory extends AbstractEMFRepositoryFactory impleme
     public void createUser(Project project) throws PersistenceException {
         Resource projectResource = project.getEmfProject().eResource();
         projectResource.getContents().add(getRepositoryContext().getUser());
-        saveProject(project);
+        xmiResourceManager.saveResource(projectResource);
     }
 
     @Override
