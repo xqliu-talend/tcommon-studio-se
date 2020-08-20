@@ -101,7 +101,6 @@
             <type>pom</type>
         </dependency>
 	</dependencies>
-<build>
 	<profiles>
 		<profile>
             <id>official</id>
