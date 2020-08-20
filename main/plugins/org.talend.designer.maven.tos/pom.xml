@@ -102,6 +102,10 @@
         </dependency>
 	</dependencies>
 <build>
+	<profiles>
+		<profile>
+            <id>official</id>
+            <build>
                 <plugins>
                     <plugin>
                         <groupId>org.eclipse.tycho</groupId>
@@ -128,4 +132,6 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+	</profiles>
 </project>
