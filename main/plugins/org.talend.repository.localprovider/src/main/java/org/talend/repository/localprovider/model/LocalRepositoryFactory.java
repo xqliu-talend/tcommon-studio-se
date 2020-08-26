@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.collections.keyvalue.MultiKey;
@@ -898,6 +899,14 @@ public class LocalRepositoryFactory extends AbstractEMFRepositoryFactory impleme
                 user.getProjectAuthorization().clear();
             }
         }
+
+        /**
+         * Avoid conflicts between different timezone
+         */
+        Optional.ofNullable(project).map(p -> p.getEmfProject()).ifPresent(p -> {
+            p.setCreationDate(null);
+            p.setDeleteDate(null);
+        });
 
         xmiResourceManager.saveResource(projectResource);
         project.getEmfProject().getMigrationTask().addAll(realMigrationTaskList);
@@ -3066,7 +3075,7 @@ public class LocalRepositoryFactory extends AbstractEMFRepositoryFactory impleme
     public void createUser(Project project) throws PersistenceException {
         Resource projectResource = project.getEmfProject().eResource();
         projectResource.getContents().add(getRepositoryContext().getUser());
-        xmiResourceManager.saveResource(projectResource);
+        saveProject(project);
     }
 
     @Override
