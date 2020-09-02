@@ -22,6 +22,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.core.IService;
 import org.talend.core.model.metadata.IMetadataTable;
 import org.talend.core.model.metadata.builder.connection.Connection;
+import org.talend.core.model.metadata.builder.connection.DatabaseConnection;
 import org.talend.core.model.metadata.builder.connection.MetadataTable;
 import org.talend.core.model.process.EComponentCategory;
 import org.talend.core.model.process.Element;
@@ -146,4 +147,12 @@ public interface IGenericWizardService extends IService {
      * @return the default action which will be invoked when double click the node.
      */
     public ITreeContextualAction getDefaultAction(RepositoryNode node);
+
+    public void initAdditionalJDBCRepositoryObjType();
+
+    public boolean getIfAdditionalJDBCDBType(String dbType);
+
+    public void initAdditonalJDBCConnectionValue(DatabaseConnection connection, Composite dynamicForm, String dbType,
+            String propertyId);
+
 }
