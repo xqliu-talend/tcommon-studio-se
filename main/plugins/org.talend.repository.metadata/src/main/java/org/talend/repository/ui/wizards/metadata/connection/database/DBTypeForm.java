@@ -71,10 +71,15 @@ public class DBTypeForm {
     public void initialize() {
         this.dbType = getConnectionDBType();
         addDBSelectCombo();
-        EDatabaseConnTemplate template = EDatabaseConnTemplate.indexOfTemplate(getDisplayConnectionDBType());
+        String displayConnectionDBType = getDisplayConnectionDBType();
+        EDatabaseConnTemplate template = EDatabaseConnTemplate.indexOfTemplate(displayConnectionDBType);
         if (template != null) {
             if (dbTypeCombo.getText().length() == 0 || !dbTypeCombo.getText().equals(template.getDbType().getDisplayName())) {
                 dbTypeCombo.setText(template.getDbType().getDisplayName());
+            }
+        } else if (isAdditionalJDBC(getDisplayConnectionDBType())) {
+            if (dbTypeCombo.getText().length() == 0 || !dbTypeCombo.getText().equals(displayConnectionDBType)) {
+                dbTypeCombo.setText(displayConnectionDBType);
             }
         }
         addListerner();
