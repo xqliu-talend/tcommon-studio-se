@@ -33,7 +33,7 @@ import java.util.UUID;
 //TODO split to several classes by the level when have a clear requirement or design : job, component, connection
 public class JobStructureCatcherUtils {
 
-	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
 
 	// TODO split it as too big, even for storing the reference only which point
 	// null
@@ -84,7 +84,7 @@ public class JobStructureCatcherUtils {
 
 		public long end_time;
 
-		public String moment = sdf.format(new Date());
+		public String moment;
 
 		public String status;
 		
@@ -169,6 +169,8 @@ public class JobStructureCatcherUtils {
 
 	public void addJobStartMessage() {
 		JobStructureCatcherMessage scm = new JobStructureCatcherMessage();
+		scm.moment = sdf.format(new Date());
+		
 		scm.job_name = this.job_name;
 		scm.job_id = this.job_id;
 		scm.job_version = this.job_version;
@@ -180,6 +182,8 @@ public class JobStructureCatcherUtils {
 
 	public void addJobEndMessage(long start_time, long end_time, String status) {
 		JobStructureCatcherMessage scm = new JobStructureCatcherMessage();
+		scm.moment = sdf.format(new Date());
+		
 		scm.job_name = this.job_name;
 		scm.job_id = this.job_id;
 		scm.job_version = this.job_version;
