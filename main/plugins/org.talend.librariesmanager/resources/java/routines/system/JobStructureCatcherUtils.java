@@ -91,10 +91,10 @@ public class JobStructureCatcherUtils {
 		public LogType log_type;
 		
 		//process uuid
-		public String pid = JobStructureCatcherUtils.getPid();
+		public String pid = ProcessIdAndThreadId.getProcessId();
 				
 		//thread uuid
-		public String tid = ThreadId.get();
+		public String tid = ProcessIdAndThreadId.getThreadId();
 
 		public JobStructureCatcherMessage() {
 		}
@@ -202,16 +202,6 @@ public class JobStructureCatcherUtils {
 			messages.clear();
 		}
 		return messagesToSend;
-	}
-
-	public static String getPid() {
-		RuntimeMXBean mx = ManagementFactory.getRuntimeMXBean();
-		String processName = mx.getName();
-		try {
-			return UUID.nameUUIDFromBytes(processName.getBytes("UTF8")).toString();
-		} catch (UnsupportedEncodingException e) {
-		}
-		return null;
 	}
 
 	public void addConnectionMessage4PerformanceMonitor(String current_connector, String sourceId, String sourceLabel,
