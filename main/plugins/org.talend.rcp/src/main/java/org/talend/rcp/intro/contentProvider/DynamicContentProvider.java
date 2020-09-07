@@ -29,7 +29,6 @@ import org.talend.commons.exception.PersistenceException;
 import org.talend.commons.ui.html.TalendHtmlModelUtil;
 import org.talend.commons.ui.runtime.exception.ExceptionHandler;
 import org.talend.commons.utils.VersionUtils;
-import org.talend.commons.utils.network.NetworkUtil;
 import org.talend.core.CorePlugin;
 import org.talend.core.GlobalServiceRegister;
 import org.talend.core.PluginChecker;
@@ -63,6 +62,8 @@ public class DynamicContentProvider extends IntroProvider {
     public static final String TRY_CLOUD_URL = "https://iam.integrationcloud.talend.com/idp/trial-registration?utm_medium=studio&utm_source=banner&utm_campaign="; //$NON-NLS-1$
 
     private static final String LEVEL_SEPARATOR = "."; //$NON-NLS-1$
+
+    private boolean flag = false;
 
     /*
      * (non-Javadoc)
@@ -196,34 +197,57 @@ public class DynamicContentProvider extends IntroProvider {
     }
 
     protected void createNewsPage(Document dom, Element parent) {
-        createOnlinePage(dom, parent, ONLINE_PAGE_URL, Messages.getString("DynamicContentProvider.TalendNewsTitle")); //$NON-NLS-1$
+        // to avoid call createOnlinePage twice
+        if (flag) {
+            createOnlinePage(dom, parent, ONLINE_PAGE_URL, Messages.getString("DynamicContentProvider.TalendNewsTitle")); //$NON-NLS-1$
+        }
+        // the createCloudPage will be called twice
+        // 1.when create control part
+        // 2.after the control was created ,will catpure a event by zoomChangeListener
+        // we can't change the two cases of calling createCloudPage, so we control it here
+        // the method will be called by the same object twice, the the second time will finish the whole page so we do
+        // nothing when first time enter this method , and only the second time to create the online page
+        flag = true;
     }
 
     protected void createCloudPage(Document dom, Element parent) {
-        createOnlinePage(dom, parent, CLOUD_PAGE_URL, null);
+        // to avoid call createOnlinePage twice
+        if (flag) {
+            createOnlinePage(dom, parent, CLOUD_PAGE_URL, null);
+        }
+        flag = true;
     }
 
+    private static Boolean accessible = null;
+
     protected void createOnlinePage(Document dom, Element parent, String onlinePageUrl, String title) {
-        if (!NetworkUtil.isNetworkValid()) {
-            setDIVStyle(dom, false);
-            return;
-        }
         HttpURLConnection urlConnection = null;
-        try {
-            URL url = new URL(getOnlinePageURL(onlinePageUrl));
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET"); //$NON-NLS-1$
-            urlConnection.setDoOutput(true);
-            urlConnection.setDoInput(true);
-            urlConnection.setUseCaches(false);
-            urlConnection.setReadTimeout(2000);
-            urlConnection.getInputStream();
+        if (accessible == null) {
+            try {
+                URL url = new URL(getOnlinePageURL(onlinePageUrl));
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET"); //$NON-NLS-1$
+                urlConnection.setDoOutput(true);
+                urlConnection.setDoInput(true);
+                urlConnection.setUseCaches(false);
+                urlConnection.setConnectTimeout(3000);
+                if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    accessible = true;
+                }
+            } catch (Exception e) {
+
+            } finally {
+                if (accessible == null) {
+                    accessible = false;
+                }
+                urlConnection.disconnect();
+            }
+        }
+        if (accessible) {
             setDIVStyle(dom, true);
-        } catch (Exception e) {
+        } else {
             setDIVStyle(dom, false);
             return;
-        } finally {
-            urlConnection.disconnect();
         }
 
         // online content
