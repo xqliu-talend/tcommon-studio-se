@@ -51,7 +51,7 @@ import org.talend.librariesmanager.ui.i18n.Messages;
  *
  * yzhang class global comment. Detailled comment <br/>
  *
- * $Id: PerlModulesViewComposite.java PerlModulesViewComposite 2007-1-26 下�?�1�7:53:04 +0000 (下�?�1�7:53:04, 2007-1-26
+ * $Id: PerlModulesViewComposite.java PerlModulesViewComposite 2007-1-26 涓嬶拷?锟�1锟�7:53:04 +0000 (涓嬶拷?锟�1锟�7:53:04, 2007-1-26
  * 2007) yzhang $
  *
  */
