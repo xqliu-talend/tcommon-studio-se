@@ -119,8 +119,6 @@ public interface ILibrariesService extends IService {
     List<ModuleNeeded> getModuleNeeded(String id, boolean isGroup);
 
     public void deployProjectLibrary(File source) throws IOException;
-    
-    public void setForceReloadCustomUri();
 
     /**
      * Listener used to fire that libraries status has been changed (new lib or new check install).

@@ -2096,10 +2096,6 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
                 this.repositoryFactoryFromProvider.beforeLogon(project);
                 ProjectManager.getInstance().getBeforeLogonRecords().clear();
                 ProjectManager.getInstance().getUpdatedRemoteHandlerRecords().clear();
-                ILibrariesService librariesService = getLibrariesService();
-                if (librariesService != null) {
-                	librariesService.setForceReloadCustomUri();
-                }
 
                 ProjectDataJsonProvider.checkAndRectifyRelationShipSetting(project.getEmfProject());
 
