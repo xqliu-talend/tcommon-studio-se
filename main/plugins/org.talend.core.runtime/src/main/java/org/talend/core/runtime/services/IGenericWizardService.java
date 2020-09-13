@@ -155,4 +155,6 @@ public interface IGenericWizardService extends IService {
     public void initAdditonalJDBCConnectionValue(DatabaseConnection connection, Composite dynamicForm, String dbType,
             String propertyId);
 
+    public String getDatabseNameByNode(INode node);
+
 }
