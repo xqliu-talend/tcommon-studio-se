@@ -26,6 +26,7 @@ import org.talend.core.model.metadata.builder.connection.DatabaseConnection;
 import org.talend.core.model.metadata.builder.connection.MetadataTable;
 import org.talend.core.model.process.EComponentCategory;
 import org.talend.core.model.process.Element;
+import org.talend.core.model.process.IElement;
 import org.talend.core.model.process.INode;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.repository.ERepositoryObjectType;
@@ -155,6 +156,6 @@ public interface IGenericWizardService extends IService {
     public void initAdditonalJDBCConnectionValue(DatabaseConnection connection, Composite dynamicForm, String dbType,
             String propertyId);
 
-    public String getDatabseNameByNode(INode node);
+    public String getDatabseNameByNode(IElement node);
 
 }
