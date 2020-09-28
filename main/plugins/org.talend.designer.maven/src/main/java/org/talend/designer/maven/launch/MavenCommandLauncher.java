@@ -192,6 +192,7 @@ public abstract class MavenCommandLauncher {
 
             // --------------Special settings for Talend----------
             boolean captureLogs = isCaptureOutputInConsoleView() || TalendMavenConstants.GOAL_INSTALL.equals(goal);
+            captureLogs = true;
             if (captureLogs) {
                 // by default will catch the output in console. so set null
                 workingCopy.setAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT, (String) null);
@@ -200,9 +201,9 @@ public abstract class MavenCommandLauncher {
             }
 
             // not same, set it. Else use the preference directly.
-            if (debugOutput != MavenPlugin.getMavenConfiguration().isDebugOutput()) {
+//            if (debugOutput != MavenPlugin.getMavenConfiguration().isDebugOutput()) {
                 workingCopy.setAttribute(MavenLaunchConstants.ATTR_DEBUG_OUTPUT, this.debugOutput); // -X -e
-            }
+//            }
 
             // -Dmaven.test.skip=true -DskipTests
             workingCopy.setAttribute(MavenLaunchConstants.ATTR_SKIP_TESTS, this.skipTests);
