@@ -150,7 +150,9 @@ public interface IGenericWizardService extends IService {
      */
     public ITreeContextualAction getDefaultAction(RepositoryNode node);
 
-    public void initAdditionalJDBCRepositoryObjType();
+    public void loadAdditionalJDBC();
+
+    public List<String> getAllAdditionalJDBCTypes();
 
     public boolean getIfAdditionalJDBCDBType(String dbType);
 
