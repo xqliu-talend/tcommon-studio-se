@@ -81,7 +81,9 @@ public final class ComponentUtilities {
 
     public static void setNodeValue(NodeType node, String name, String value) {
         ElementParameterType property = getNodeProperty(node, name);
-        property.setValue(value);
+        if (property != null) {
+            property.setValue(value);
+        }
     }
 
     public static void removeNodeProperty(NodeType node, String property) {
