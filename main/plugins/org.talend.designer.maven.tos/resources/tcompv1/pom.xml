@@ -73,6 +73,12 @@
     <dependencies>
         <dependency>
             <groupId>org.talend.sdk.component</groupId>
+            <artifactId>component-runtime</artifactId>
+            <version>${tcomp.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.sdk.component</groupId>
             <artifactId>component-server</artifactId>
             <version>${tcomp.version}</version>
         </dependency>
