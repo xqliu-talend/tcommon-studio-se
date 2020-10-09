@@ -83,6 +83,8 @@ public final class ComponentUtilities {
         ElementParameterType property = getNodeProperty(node, name);
         if (property != null) {
             property.setValue(value);
+        } else {
+            throw new IllegalArgumentException( "The component node "+node.getComponentName()+" doesn't have the property "+name );
         }
     }
 
