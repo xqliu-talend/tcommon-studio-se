@@ -50,6 +50,7 @@ import org.talend.core.model.metadata.types.JavaTypesManager;
 import org.talend.core.model.process.IContext;
 import org.talend.core.model.process.IContextManager;
 import org.talend.core.model.process.IContextParameter;
+import org.talend.core.model.process.INode;
 import org.talend.core.model.repository.IRepositoryPrefConstants;
 import org.talend.core.prefs.ITalendCorePrefConstants;
 import org.talend.core.runtime.services.IGenericDBService;
@@ -675,6 +676,21 @@ public final class ContextParameterUtils {
             return false;
         }
         return isContainContextParam(value) || containCodeVariable(value, "globalMap.");
+    }
+
+    public static String getValueIfContextModeFromNodeProcess(INode node, String paramValue) {
+        String realValue = paramValue;
+        if (!isContainContextParam(paramValue)) {
+            return realValue;
+        }
+        if (node.getProcess() != null && node.getProcess().getContextManager() != null) {
+            IContextParameter contextParameter = node.getProcess().getContextManager().getDefaultContext()
+                    .getContextParameter(getContextString(paramValue));
+            if (contextParameter != null && StringUtils.isNotBlank(contextParameter.getValue())) {
+                realValue = contextParameter.getValue();
+            }
+        }
+        return realValue;
     }
 
 }
