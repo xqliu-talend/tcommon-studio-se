@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Apache Plug-in
-Bundle-SymbolicName: org.talend.libraries.apache
+Bundle-SymbolicName: org.talend.libraries.apache;singleton:=true
 Bundle-Version: 7.4.1.qualifier
 Bundle-ClassPath: .,
  lib/ant.jar,
