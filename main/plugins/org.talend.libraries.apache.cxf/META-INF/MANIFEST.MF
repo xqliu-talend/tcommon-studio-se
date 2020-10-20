@@ -150,7 +150,10 @@ Export-Package: javax.ws.rs,
  org.apache.cxf.ws.policy,
  org.apache.neethi,
  org.apache.cxf.ws.policy.mtom,
- org.apache.neethi.builders
+ org.apache.neethi.builders,
+ javax.xml.ws.spi,
+ org.apache.cxf.jaxws22.spi,
+ org.apache.cxf.jaxws.spi
 Require-Bundle: javax.wsdl;bundle-version="1.6.2",
  org.apache.log4j
 Eclipse-BundleShape: dir
