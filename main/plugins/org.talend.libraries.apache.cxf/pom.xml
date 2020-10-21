@@ -189,6 +189,11 @@
   		<artifactId>xmlschema-core</artifactId>
  		<version>2.2.4</version>
     </dependency>
+    <dependency>
+	  <groupId>javax.jws</groupId>
+	  <artifactId>javax.jws</artifactId>
+	  <version>2.0.0.v201005080400</version>
+	</dependency>
   </dependencies>
   
   <build>
@@ -219,7 +224,7 @@
 						<excludeTypes>pom</excludeTypes>
 						<excludeTransitive>true</excludeTransitive>
 						<outputDirectory>${project.basedir}/lib</outputDirectory>
-						<includeGroupIds>org.apache.cxf,com.sun.activation,jakarta.activation,jakarta.ws.rs,jakarta.xml.bind,javax.annotation,org.glassfish.jaxb,javax.xml.ws,org.apache.neethi,org.codehaus.woodstox,org.talend.libraries,commons-discovery,javax.xml.soap,javax.xml.bind,com.sun.xml.bind,wsdl4j,org.apache.ws.xmlschema</includeGroupIds>
+						<includeGroupIds>org.apache.cxf,com.sun.activation,jakarta.activation,jakarta.ws.rs,jakarta.xml.bind,javax.annotation,org.glassfish.jaxb,javax.xml.ws,org.apache.neethi,org.codehaus.woodstox,org.talend.libraries,commons-discovery,javax.xml.soap,javax.xml.bind,com.sun.xml.bind,wsdl4j,org.apache.ws.xmlschema,javax.jws</includeGroupIds>
 					</configuration>
 				</execution>
 			</executions>
