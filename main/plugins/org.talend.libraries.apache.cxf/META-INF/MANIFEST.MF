@@ -32,7 +32,9 @@ Bundle-ClassPath: .,
  lib/jaxb-runtime-2.3.2.jar,
  lib/jakarta.activation-api-1.2.1.jar,
  lib/jakarta.activation-1.2.1.jar,
- lib/javax.ws.rs-api-2.0-m10-6.0.0.jar
+ lib/javax.ws.rs-api-2.0-m10-6.0.0.jar,
+ lib/xmlschema-core-2.2.4.jar,
+ lib/javax.jws_2.0.0.v201005080400.jar
 Export-Package: javax.ws.rs,
  javax.ws.rs.client,
  javax.ws.rs.container,
@@ -152,8 +154,8 @@ Export-Package: javax.ws.rs,
  org.apache.cxf.ws.policy.mtom,
  org.apache.neethi.builders,
  javax.xml.ws.spi,
- org.apache.cxf.jaxws22.spi,
- org.apache.cxf.jaxws.spi
+ org.apache.cxf.jaxws.spi,
+ javax.xml.bind
 Require-Bundle: javax.wsdl;bundle-version="1.6.2",
  org.apache.log4j
 Eclipse-BundleShape: dir
