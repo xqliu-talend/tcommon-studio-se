@@ -176,7 +176,8 @@ Export-Package: javax.xml.bind,
  org.talend.mdm.webservice,
  org.apache.ws.commons.schema.utils,
  org.apache.ws.commons.schema.resolver,
- org.apache.ws.commons.schema
+ org.apache.ws.commons.schema,
+ javax.jws
 Require-Bundle: javax.wsdl;bundle-version="1.6.2",
  org.apache.log4j,
  javax.activation
