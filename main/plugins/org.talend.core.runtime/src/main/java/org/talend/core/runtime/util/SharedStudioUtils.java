@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.core.GlobalServiceRegister;
+import org.talend.core.model.components.IComponentsFactory;
 import org.talend.core.service.IUpdateService;
 import org.talend.utils.io.FilesUtils;
 
@@ -80,4 +81,10 @@ public class SharedStudioUtils {
         }
         return false;
     }
+    
+	public static File getSharedStudioComponentFolder() {
+		File configFolder = new File(Platform.getConfigurationLocation().getURL().getFile());
+		File componentFolder = new File(configFolder, IComponentsFactory.COMPONENTS_INNER_FOLDER);
+		return componentFolder;
+	}
 }
