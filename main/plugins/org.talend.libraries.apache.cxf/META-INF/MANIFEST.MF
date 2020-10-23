@@ -34,9 +34,7 @@ Bundle-ClassPath: .,
  lib/javax.ws.rs-api-2.0-m10-6.0.0.jar,
  lib/xmlschema-core-2.2.4.jar,
  lib/javax.jws_2.0.0.v201005080400.jar,
- lib/jaxb-api-2.2.7.jar,
- lib/jaxb-core-2.2.7.jar,
- lib/jaxb-impl-2.2.7.jar
+ lib/jaxb-runtime-2.3.2.jar
 Export-Package: com.sun.xml.bind,
  com.sun.xml.bind.annotation,
  com.sun.xml.bind.api,
