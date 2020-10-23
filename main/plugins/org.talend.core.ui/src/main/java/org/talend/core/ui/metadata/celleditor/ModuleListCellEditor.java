@@ -201,14 +201,6 @@ public class ModuleListCellEditor extends DialogCellEditor {
             }
         }
 
-        // cConfig
-        if (!isNotCConfig) {
-            if (newValue.startsWith(MavenUrlHelper.MVN_PROTOCOL)) {
-                MavenArtifact art = MavenUrlHelper.parseMvnUrl(newValue);
-                newValue = art.getFileName();
-            }
-        }
-
         //
         executeCommand(new ModelChangeCommand(tableParam, param.getName(), newValue, index));
 
