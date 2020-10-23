@@ -202,7 +202,7 @@ Export-Package: Require-Bundle: javax.wsdl;bundle-version="1.6.2",
  org.apache.log4j,
  org.apache.neethi,
  org.apache.neethi.builders
-Require-Bundle: javax.wsdl;bundle-version="1.6.2",
+Require-Bundle: javax.wsdl,
  org.apache.log4j
 Eclipse-BundleShape: dir
 
