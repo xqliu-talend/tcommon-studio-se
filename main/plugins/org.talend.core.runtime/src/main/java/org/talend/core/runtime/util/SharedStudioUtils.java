@@ -84,7 +84,6 @@ public class SharedStudioUtils {
     
 	public static File getSharedStudioComponentFolder() {
 		File configFolder = new File(Platform.getConfigurationLocation().getURL().getFile());
-		File componentFolder = new File(configFolder, IComponentsFactory.COMPONENTS_INNER_FOLDER);
-		return componentFolder;
+		return configFolder;
 	}
 }
