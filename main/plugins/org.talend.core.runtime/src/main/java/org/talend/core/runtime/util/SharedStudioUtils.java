@@ -15,10 +15,13 @@ package org.talend.core.runtime.util;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.core.GlobalServiceRegister;
+import org.talend.core.model.components.ComponentUtilities;
 import org.talend.core.model.components.IComponentsFactory;
 import org.talend.core.service.IUpdateService;
 import org.talend.utils.io.FilesUtils;
@@ -82,8 +85,16 @@ public class SharedStudioUtils {
         return false;
     }
     
-	public static File getSharedStudioComponentFolder() {
+	public static File getSharedStudioComponentsParentFolder() {
 		File configFolder = new File(Platform.getConfigurationLocation().getURL().getFile());
 		return configFolder;
+	}
+	
+	public static File getSharedStudioComponentsExtFolder() {
+		File componentFolder = SharedStudioUtils.getSharedStudioComponentsParentFolder();
+		IPath path = new Path(IComponentsFactory.COMPONENTS_INNER_FOLDER);
+        path = path.append(IComponentsFactory.EXTERNAL_COMPONENTS_INNER_FOLDER);
+        File extchangeFolder = new File (componentFolder, path.toOSString());
+		return extchangeFolder;
 	}
 }
