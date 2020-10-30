@@ -53,7 +53,7 @@ public class BigDataBasicUtil {
 
     private static IDynamicDistributionManager getDynamicDistributionManager(IProgressMonitor monitor) throws Exception {
         if (GlobalServiceRegister.getDefault().isServiceRegistered(IHadoopDistributionService.class)) {
-            IHadoopDistributionService hdService = (IHadoopDistributionService) GlobalServiceRegister.getDefault()
+            IHadoopDistributionService hdService = GlobalServiceRegister.getDefault()
                     .getService(IHadoopDistributionService.class);
             if (hdService != null) {
                 return hdService.getDynamicDistributionManager();
@@ -131,5 +131,17 @@ public class BigDataBasicUtil {
             ExceptionHandler.process(e);
         }
         return null;
+    }
+
+    public static boolean isDynamicDistributionMavenUrl(String mvnUri) {
+        try {
+            IDynamicDistributionManager ddManager = getDynamicDistributionManager(new NullProgressMonitor());
+            if (ddManager != null) {
+                return ddManager.isDynamicDistributionMavenUrl(mvnUri);
+            }
+        } catch (Exception e) {
+            ExceptionHandler.process(e);
+        }
+        return false;
     }
 }

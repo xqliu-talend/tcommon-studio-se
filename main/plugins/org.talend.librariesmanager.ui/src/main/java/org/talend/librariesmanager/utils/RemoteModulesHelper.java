@@ -47,6 +47,7 @@ import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.utils.network.NetworkUtil;
 import org.talend.core.GlobalServiceRegister;
 import org.talend.core.ILibraryManagerService;
+import org.talend.core.hadoop.BigDataBasicUtil;
 import org.talend.core.model.general.ModuleNeeded;
 import org.talend.core.model.general.ModuleToInstall;
 import org.talend.core.nexus.ArtifactRepositoryBean;
@@ -160,7 +161,7 @@ public class RemoteModulesHelper {
                 if (useLocalLicenseData) {
                     searchFromLocalDataFile(mavenUrisTofetch, monitor);
                     addCachedModulesToToBeInstallModules(toInstall, mavenUrisTofetch, contextMap, remoteCache);
-                } 
+                }
                 if (!onlyUseLocalLicenseData || LibraryDataService.getInstance().isBuildLibrariesData()) {
                     searchFromRemoteNexus(mavenUrisTofetch, monitor);
                     addCachedModulesToToBeInstallModules(toInstall, mavenUrisTofetch, contextMap, remoteCache);  
@@ -270,6 +271,14 @@ public class RemoteModulesHelper {
                 String uriToCheck = iterator.next();
                 final MavenArtifact parseMvnUrl = MavenUrlHelper.parseMvnUrl(uriToCheck);
                 if (parseMvnUrl != null) {
+                    String repositoryUrl = parseMvnUrl.getRepositoryUrl();
+                    if (!LibraryDataService.getInstance().isBuildLibrariesData()) {
+                        if (StringUtils.isNotEmpty(repositoryUrl)
+                                && parseMvnUrl.getGroupId().startsWith(MavenConstants.APACHE_GROUP_ID)
+                                && BigDataBasicUtil.isDynamicDistributionMavenUrl(uriToCheck)) {
+                            continue;
+                        }
+                    }
                     service.fillLibraryDataByRemote(uriToCheck, parseMvnUrl);
                     if (!MavenConstants.DOWNLOAD_MANUAL.equals(parseMvnUrl.getDistribution())) {
                         artifactList.add(parseMvnUrl);
@@ -370,7 +379,7 @@ public class RemoteModulesHelper {
                         }
                     }
 
-                    toInstall.add(moduleToInstall);
+                    toInstall.add(moduleToInstall.clone());
                     iterator.remove();
                 }
             }
@@ -641,7 +650,7 @@ public class RemoteModulesHelper {
     public RemoteModulesFetchRunnable getNotInstalledModulesRunnable(List<ModuleNeeded> neededModules,
             List<ModuleToInstall> toInstall, boolean collectModulesWithJarName, boolean useLocalLicenseData, boolean onlyUseLocalLicenseData) {
         Map<String, List<ModuleNeeded>> contextMap = new HashMap<String, List<ModuleNeeded>>();
-        ILibraryManagerService librairesManagerService = (ILibraryManagerService) GlobalServiceRegister.getDefault()
+        ILibraryManagerService librairesManagerService = GlobalServiceRegister.getDefault()
                 .getService(ILibraryManagerService.class);
         // collect mvnuri and modules incase many modules have the same mvnuri
         final Iterator<ModuleNeeded> iterator = neededModules.iterator();
