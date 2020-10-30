@@ -194,22 +194,32 @@ public class ModuleListCellEditor extends DialogCellEditor {
         IElement element = this.tableParam.getElement();
         boolean isNotCConfig = element.getElementParameter("COMPONENT_NAME") == null ?
                 true : !"cConfig".equals(element.getElementParameter("COMPONENT_NAME").getValue());
-        if (element != null && isNotCConfig) {
+        if (element != null) {
             IElementParameter updateComponentsParam = element.getElementParameter("UPDATE_COMPONENTS"); //$NON-NLS-1$
             if (updateComponentsParam != null) {
                 updateComponentsParam.setValue(Boolean.TRUE);
             }
         }
 
+        if (!isNotCConfig) {
+            if (MavenUrlHelper.isMvnUrl(newValue)) {
+                MavenArtifact ma = MavenUrlHelper.parseMvnUrl(newValue);
+                if (newVal == null) {
+                    newVal = "";
+                }
+                executeCommand(new ModelChangeCommand(tableParam, "JAR_PATH", newVal, index));
+                executeCommand(new ModelChangeCommand(tableParam, "MVN_URI", newValue, index));
+
+                if (ma != null) {
+                    executeCommand(new ModelChangeCommand(tableParam, "JAR_NEXUS_VERSION", ma.getVersion(), index));
+                    newValue = ma.getFileName();
+                }
+
+            }
+        }
+
         //
         executeCommand(new ModelChangeCommand(tableParam, param.getName(), newValue, index));
-
-        if (newVal != null) {
-            executeCommand(new ModelChangeCommand(tableParam, "JAR_PATH", newVal, index));
-        }
-        if (nexusVersion != null) {
-            executeCommand(new ModelChangeCommand(tableParam, "JAR_NEXUS_VERSION", nexusVersion, index));
-        }
 
         oldValue = newValue;
         if (getTableViewer() != null) {
