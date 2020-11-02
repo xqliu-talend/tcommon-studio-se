@@ -345,20 +345,8 @@ public class AggregatorPomsHelper {
     private static boolean checkIfCanAddToParentModules(Property property, boolean checkFilter) {
         // Check relation for ESB service job, should not be added into main pom
         if (property != null) {
-            List<Relation> relations = RelationshipItemBuilder.getInstance().getItemsRelatedTo(property.getId(),
-                    property.getVersion(), RelationshipItemBuilder.JOB_RELATION);
-            for (Relation relation : relations) {
-                if (RelationshipItemBuilder.SERVICES_RELATION.equals(relation.getType())) {
-                    return false;
-                }
-            }
-            if (GlobalServiceRegister.getDefault().isServiceRegistered(IESBService.class)) {
-                IESBService service = GlobalServiceRegister.getDefault().getService(IESBService.class);
-                if (service != null) {
-                    if (service.isSOAPServiceProvider(property.getItem())) {
-                        return false;
-                    }
-                }
+            if (isSOAPServiceProvider(property)) {
+                return false;
             }
             // for import won't add for exclude option
             if (property.getItem() != null && property.getItem().getState() != null && property.getItem().getState().isDeleted()
@@ -904,7 +892,7 @@ public class AggregatorPomsHelper {
                     }
                     IFile pomFile = getItemPomFolder(item.getProperty()).getFile(TalendMavenConstants.POM_FILE_NAME);
                     // filter esb data service node
-                    if (!isDataServiceOperation(object.getProperty()) && pomFile.exists()) {
+                    if (!isSOAPServiceProvider(object.getProperty()) && pomFile.exists()) {
                         modules.add(getModulePath(pomFile));
                     }
                 }
@@ -945,13 +933,21 @@ public class AggregatorPomsHelper {
      * @param property
      * @return
      */
-    private boolean isDataServiceOperation(Property property) {
+    private static boolean isSOAPServiceProvider(Property property) {
         if (property != null) {
             List<Relation> relations = RelationshipItemBuilder.getInstance().getItemsRelatedTo(property.getId(),
                     property.getVersion(), RelationshipItemBuilder.JOB_RELATION);
             for (Relation relation : relations) {
                 if (RelationshipItemBuilder.SERVICES_RELATION.equals(relation.getType())) {
                     return true;
+                }
+            }
+            if (GlobalServiceRegister.getDefault().isServiceRegistered(IESBService.class)) {
+                IESBService service = GlobalServiceRegister.getDefault().getService(IESBService.class);
+                if (service != null) {
+                    if (service.isSOAPServiceProvider(property.getItem())) {
+                        return true;
+                    }
                 }
             }
         }
