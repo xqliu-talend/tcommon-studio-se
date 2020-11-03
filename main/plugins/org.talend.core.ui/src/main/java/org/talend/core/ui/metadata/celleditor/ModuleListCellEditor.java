@@ -36,8 +36,6 @@ import org.talend.core.model.process.IElement;
 import org.talend.core.model.process.IElementParameter;
 import org.talend.core.model.process.INode;
 import org.talend.core.model.process.IProcess2;
-import org.talend.core.runtime.maven.MavenArtifact;
-import org.talend.core.runtime.maven.MavenUrlHelper;
 import org.talend.core.ui.CoreUIPlugin;
 import org.talend.core.ui.process.IGEFProcess;
 import org.talend.core.ui.services.IDesignerCoreUIService;
@@ -192,29 +190,10 @@ public class ModuleListCellEditor extends DialogCellEditor {
         }
         // enable to refresh component setting after change modules.
         IElement element = this.tableParam.getElement();
-        boolean isNotCConfig = element.getElementParameter("COMPONENT_NAME") == null ?
-                true : !"cConfig".equals(element.getElementParameter("COMPONENT_NAME").getValue());
         if (element != null) {
             IElementParameter updateComponentsParam = element.getElementParameter("UPDATE_COMPONENTS"); //$NON-NLS-1$
             if (updateComponentsParam != null) {
                 updateComponentsParam.setValue(Boolean.TRUE);
-            }
-        }
-
-        if (!isNotCConfig) {
-            if (MavenUrlHelper.isMvnUrl(newValue)) {
-                MavenArtifact ma = MavenUrlHelper.parseMvnUrl(newValue);
-                if (newVal == null) {
-                    newVal = "";
-                }
-                executeCommand(new ModelChangeCommand(tableParam, "JAR_PATH", newVal, index));
-                executeCommand(new ModelChangeCommand(tableParam, "MVN_URI", newValue, index));
-
-                if (ma != null) {
-                    executeCommand(new ModelChangeCommand(tableParam, "JAR_NEXUS_VERSION", ma.getVersion(), index));
-                    newValue = ma.getFileName();
-                }
-
             }
         }
 
