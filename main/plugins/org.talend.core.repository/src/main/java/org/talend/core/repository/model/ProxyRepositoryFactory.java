@@ -1801,12 +1801,10 @@ public final class ProxyRepositoryFactory implements IProxyRepositoryFactory {
      */
     private void emptyTempFolder(Project project) throws PersistenceException {
     	try {
-            String str = (System.getProperty("eclipse.home.location") + "temp").substring(5);
+            String str = SharedStudioUtils.getTempFolderPath().toPortableString();
             FilesUtils.deleteFolder(new File(str), false);
     	}catch (Exception ex) {
-    		if (!SharedStudioUtils.isSharedStudioMode()) {
-    			ExceptionHandler.process(ex);
-    		}
+    		ExceptionHandler.process(ex);
     	}
         long start = System.currentTimeMillis();
         IProject fsProject = ResourceUtils.getProject(project);
