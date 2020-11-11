@@ -149,6 +149,7 @@ public class ConvertJobsUtil {
     }
 
     public static enum JobStreamingFramework {
+        STORMFRAMEWORK("Storm", "Storm (Deprecated)", "_STORM_STORM_FRAMEWORK_"), //$NON-NLS-1$ //$NON-NLS-2$
         SPARKSTREAMINGFRAMEWORK("Spark Streaming", "Spark Streaming", "_STORM_SPARKSTREAMING_FRAMEWORK_"); //$NON-NLS-1$ //$NON-NLS-2$
 
         private String name;
