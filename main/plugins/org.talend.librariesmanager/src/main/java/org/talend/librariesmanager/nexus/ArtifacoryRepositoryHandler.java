@@ -29,6 +29,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.talend.commons.CommonsPlugin;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.utils.network.TalendProxySelector.IProxySelectorProvider;
 import org.talend.core.nexus.HttpClientTransport;
@@ -52,8 +53,6 @@ import net.sf.json.JSONObject;
 public class ArtifacoryRepositoryHandler extends AbstractArtifactRepositoryHandler {
 
     private String SEARCH_SERVICE = "api/search/gavc?"; //$NON-NLS-1$
-
-    private String SEARCH_RESULT_PREFIX = "api/storage/";//$NON-NLS-1$
 
     /*
      * (non-Javadoc)
@@ -123,6 +122,11 @@ public class ArtifacoryRepositoryHandler extends AbstractArtifactRepositoryHandl
     @Override
     public List<MavenArtifact> search(String groupIdToSearch, String artifactId, String versionToSearch, boolean fromRelease,
             boolean fromSnapshot) throws Exception {
+        return requestSearch(groupIdToSearch, artifactId, versionToSearch, fromRelease, fromSnapshot, false);
+    }
+
+    protected List<MavenArtifact> requestSearch(String groupIdToSearch, String artifactId, String versionToSearch,
+            boolean fromRelease, boolean fromSnapshot, boolean useSnapshotVersion) throws Exception {
         String serverUrl = serverBean.getServer();
         if (!serverUrl.endsWith("/")) { //$NON-NLS-1$
             serverUrl = serverUrl + "/"; //$NON-NLS-1$
@@ -187,14 +191,11 @@ public class ArtifacoryRepositoryHandler extends AbstractArtifactRepositoryHandl
             throw new Exception(resultStr);
         }
         if (resultArray != null) {
-            String resultUrl = serverUrl + SEARCH_RESULT_PREFIX;
             for (int i = 0; i < resultArray.size(); i++) {
                 JSONObject jsonObject = resultArray.getJSONObject(i);
                 String lastUpdated = jsonObject.getString("lastUpdated"); //$NON-NLS-1$
                 String artifactPath = jsonObject.getString("path"); //$NON-NLS-1$
-                String uri = jsonObject.getString("uri"); //$NON-NLS-1$
-                uri = uri.substring(resultUrl.length(), uri.length());
-                String[] split = uri.split("/"); //$NON-NLS-1$
+                String[] split = artifactPath.split("/"); //$NON-NLS-1$
                 if (split.length > 4) {
                     String fileName = split[split.length - 1];
                     if (!fileName.endsWith("pom")) { //$NON-NLS-1$
@@ -205,9 +206,21 @@ public class ArtifacoryRepositoryHandler extends AbstractArtifactRepositoryHandl
                         }
                         if (type != null) {
                             MavenArtifact artifact = new MavenArtifact();
-                            String v = split[split.length - 2];
-                            String a = split[split.length - 3];
                             String g = ""; //$NON-NLS-1$
+                            String a = split[split.length - 3];
+                            String v = split[split.length - 2];
+                            if (fromSnapshot && useSnapshotVersion) {
+                                String jarName = split[split.length - 1];
+                                if (jarName.contains("-")) {
+                                    v = jarName.substring(jarName.indexOf("-") + 1);
+                                    v = v.substring(0, v.lastIndexOf("."));
+                                } else {
+                                    if (CommonsPlugin.isDebugMode()) {
+                                        ExceptionHandler
+                                                .process(new Exception("the jar name is not the usual style: " + jarName));
+                                    }
+                                }
+                            }
                             for (int j = 1; j < split.length - 3; j++) {
                                 if ("".equals(g)) { //$NON-NLS-1$
                                     g = split[j];
