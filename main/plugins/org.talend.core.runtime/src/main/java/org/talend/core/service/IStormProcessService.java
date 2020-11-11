@@ -14,6 +14,7 @@ package org.talend.core.service;
 
 import java.util.List;
 
+import org.talend.commons.ui.runtime.image.IImage;
 import org.talend.core.IService;
 import org.talend.core.model.components.IComponentsHandler;
 import org.talend.core.model.process.IProcess2;
@@ -37,6 +38,8 @@ public interface IStormProcessService extends IService {
      * @param process the current process.
      */
     public void generateSparkStreamingInfosParameter(IProcess2 process);
+
+    public IImage getStormWizardIcon(String framework);
 
     public IComponentsHandler getSparkStreamingComponentsHandler();
 
