@@ -31,6 +31,8 @@ public interface IStormProcessService extends IService {
 
     public boolean collectStandardProcessNode(List<String> filteredContents, Object node);
 
+    public boolean isStormItem(Item item);
+
     /**
      * This method is responsible for creating additional information which are going to be registered in the Process
      * (and then in the Item). DOC rdubois Comment method "generateSparkStreamingInfosParameter".
