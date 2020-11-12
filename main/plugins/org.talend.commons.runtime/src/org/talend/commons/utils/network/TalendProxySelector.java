@@ -173,6 +173,7 @@ public class TalendProxySelector extends ProxySelector {
         checkProxyManager(IProxyChangeEvent.PROXY_DATA_CHANGED);
         proxyManager.addProxyChangeListener(event -> checkProxyManager(event.getChangeType()));
 
+        NetworkUtil.checkProxyAuthSupport();
         initHostMap();
         initRedirectList();
     }
@@ -374,6 +375,7 @@ public class TalendProxySelector extends ProxySelector {
         if (printProxyLog) {
             ExceptionHandler.log("TalendProxySelector.select " + uri);
         }
+        NetworkUtil.checkProxyAuthSupport();
         if (uri == null) {
             List<Proxy> result = new ArrayList<>();
             result.add(Proxy.NO_PROXY);
