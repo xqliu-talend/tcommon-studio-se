@@ -136,9 +136,8 @@ public abstract class AbstractMavenProcessorPom extends CreateMavenBundleTemplat
 
         Map<ETalendMavenVariables, String> variablesValuesMap = new HashMap<ETalendMavenVariables, String>();
         // no need check property is null or not, because if null, will get default ids.
-        
-        if (JobUtils.isJob(property) && ProcessUtils.isChildRouteProcess(process)) {
-            JobInfo lastMainJob = LastGenerationInfo.getInstance().getLastMainJob();
+        JobInfo lastMainJob = LastGenerationInfo.getInstance().getLastMainJob();  
+        if (JobUtils.isJob(property) && ProcessUtils.isChildRouteProcess(process) && lastMainJob != null) {
             variablesValuesMap.put(ETalendMavenVariables.JobGroupId, PomIdsHelper.getJobGroupId(lastMainJob.getProcessor().getProperty()));
             variablesValuesMap.put(ETalendMavenVariables.JobVersion, PomIdsHelper.getJobVersion(lastMainJob.getProcessor().getProperty()));	    	
         }else {
