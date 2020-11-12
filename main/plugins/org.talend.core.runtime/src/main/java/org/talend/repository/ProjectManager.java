@@ -21,8 +21,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
@@ -97,8 +95,7 @@ public final class ProjectManager {
 
     private Set<Project> tempProjects;
 
-    private ReadWriteLock cachedNodeLock = new ReentrantReadWriteLock();
-    private Set<IRepositoryNode> cachedCurrentMainProjectNodes = Collections.newSetFromMap(new WeakHashMap<IRepositoryNode, Boolean>());
+    private WeakHashMap<IRepositoryViewObject, org.talend.core.model.properties.Project> cachedProjects = new WeakHashMap<IRepositoryViewObject, org.talend.core.model.properties.Project>();
 
     private ProjectManager() {
         beforeLogonRecords = new HashSet<String>();
@@ -440,24 +437,6 @@ public final class ProjectManager {
         return false;
     }
 
-    private boolean findFromCachedMainProjectNodes(IRepositoryNode node) {
-        cachedNodeLock.readLock().lock();
-        try {
-            return cachedCurrentMainProjectNodes.contains(node);
-        } finally {
-            cachedNodeLock.readLock().unlock();
-        }
-    }
-
-    private void addToCachedMainProjectNodes(IRepositoryNode node) {
-        cachedNodeLock.writeLock().lock();
-        try {
-            cachedCurrentMainProjectNodes.add(node);
-        } finally {
-            cachedNodeLock.writeLock().unlock();
-        }
-    }
-
     /**
      *
      * ggu Comment method "isInCurrentMainProject".
@@ -465,11 +444,7 @@ public final class ProjectManager {
      * check the node in current main project.
      */
     public boolean isInCurrentMainProject(IRepositoryNode node) {
-        boolean ret = false;
         if (node != null) {
-            if (findFromCachedMainProjectNodes(node)) {
-                return true;
-            }
             Project curP = getCurrentProject();
             if (PluginChecker.isRefProjectLoaded()) {
                 IReferencedProjectService service = (IReferencedProjectService) GlobalServiceRegister.getDefault()
@@ -477,21 +452,24 @@ public final class ProjectManager {
                 if (service != null && service.isMergeRefProject() && curP != null) {
                     IRepositoryViewObject object = node.getObject();
                     if (object == null) {
-                        addToCachedMainProjectNodes(node);
                         return true;
                     }
-                    org.talend.core.model.properties.Project emfProject = getProject(object.getProperty().getItem());
+                    org.talend.core.model.properties.Project emfProject = cachedProjects.get(object);
+                    if (emfProject == null) {
+                        emfProject = getProject(object.getProperty().getItem());
+                        cachedProjects.put(object, emfProject);
+                    }
                     org.talend.core.model.properties.Project curProject = curP.getEmfProject();
-                    ret = emfProject.equals(curProject);
+                    return emfProject.equals(curProject);
 
                 } else {
                     IProjectRepositoryNode root = node.getRoot();
                     if (root != null) {
                         Project project = root.getProject();
                         if (project != null) {
-                            ret = project.equals(curP);
+                            return project.equals(curP);
                         } else {
-                            ret = true;
+                            return true;
                         }
                     }
                 }
@@ -501,17 +479,15 @@ public final class ProjectManager {
                 if (root != null) {
                     Project project = root.getProject();
                     if (project != null && curP != null) {
-                        ret = project.getTechnicalLabel().equals(curP.getTechnicalLabel());
+                        return project.getTechnicalLabel().equals(curP.getTechnicalLabel());
                     } else {
-                        ret = true;
+                        return true;
                     }
                 }
+
             }
         }
-        if (ret) {
-            addToCachedMainProjectNodes(node);
-        }
-        return ret;
+        return false;
     }
 
     public static IProjectRepositoryNode researchProjectNode(Project project) {
