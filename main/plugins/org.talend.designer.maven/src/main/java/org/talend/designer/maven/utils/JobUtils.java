@@ -117,7 +117,7 @@ public class JobUtils {
         }
         return false;
     }
-  
+
     public static boolean isJob(Property p) {
         if (p != null) {
             return ERepositoryObjectType.getType(p).equals(ERepositoryObjectType.PROCESS);
