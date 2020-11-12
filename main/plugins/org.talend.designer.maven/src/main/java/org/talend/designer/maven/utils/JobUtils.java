@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.talend.commons.exception.PersistenceException;
 import org.talend.core.GlobalServiceRegister;
-import org.talend.core.model.process.INode;
 import org.talend.core.model.process.IProcess;
 import org.talend.core.model.process.JobInfo;
 import org.talend.core.model.process.ProcessUtils;
