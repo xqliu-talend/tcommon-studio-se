@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
@@ -95,7 +94,7 @@ public final class ProjectManager {
 
     private Set<Project> tempProjects;
 
-    private WeakHashMap<IRepositoryViewObject, org.talend.core.model.properties.Project> cachedProjects = new WeakHashMap<IRepositoryViewObject, org.talend.core.model.properties.Project>();
+    private Map<String, Boolean> cachedObjects = new HashMap<String, Boolean>();
 
     private ProjectManager() {
         beforeLogonRecords = new HashSet<String>();
@@ -454,13 +453,18 @@ public final class ProjectManager {
                     if (object == null) {
                         return true;
                     }
-                    org.talend.core.model.properties.Project emfProject = cachedProjects.get(object);
-                    if (emfProject == null) {
-                        emfProject = getProject(object.getProperty().getItem());
-                        cachedProjects.put(object, emfProject);
+
+                    if (object.getId() != null && cachedObjects.containsKey(object.getId())) {
+                        return cachedObjects.get(object.getId());
                     }
+
+                    org.talend.core.model.properties.Project emfProject = getProject(object.getProperty().getItem());
                     org.talend.core.model.properties.Project curProject = curP.getEmfProject();
-                    return emfProject.equals(curProject);
+                    boolean ret = emfProject.equals(curProject);
+                    if (object.getId() != null) {
+                        cachedObjects.put(object.getId(), ret);
+                    }
+                    return ret;
 
                 } else {
                     IProjectRepositoryNode root = node.getRoot();
