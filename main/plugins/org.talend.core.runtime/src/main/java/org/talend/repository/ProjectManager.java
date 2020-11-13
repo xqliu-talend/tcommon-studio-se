@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
@@ -94,7 +95,7 @@ public final class ProjectManager {
 
     private Set<Project> tempProjects;
 
-    private Map<String, Boolean> cachedObjects = new HashMap<String, Boolean>();
+    private WeakHashMap<IRepositoryViewObject, Boolean> cachedObjects = new WeakHashMap<IRepositoryViewObject, Boolean>();
 
     private ProjectManager() {
         beforeLogonRecords = new HashSet<String>();
@@ -453,17 +454,14 @@ public final class ProjectManager {
                     if (object == null) {
                         return true;
                     }
-                    String key = getCacheKey(object);
-                    if (key != null && cachedObjects.containsKey(key)) {
-                        return cachedObjects.get(key);
+                    if (cachedObjects.containsKey(object)) {
+                        return cachedObjects.get(object);
                     }
 
                     org.talend.core.model.properties.Project emfProject = getProject(object.getProperty().getItem());
                     org.talend.core.model.properties.Project curProject = curP.getEmfProject();
                     boolean ret = emfProject.equals(curProject);
-                    if (key != null) {
-                        cachedObjects.put(key, ret);
-                    }
+                    cachedObjects.put(object, ret);
                     return ret;
 
                 } else {
@@ -492,13 +490,6 @@ public final class ProjectManager {
             }
         }
         return false;
-    }
-
-    private static String getCacheKey(IRepositoryViewObject obj) {
-        if (obj.getId() == null && obj.getProjectLabel() == null) {
-            return null;
-        }
-        return (obj.getId() == null ? "" : obj.getId()) + "-" + (obj.getProjectLabel() == null ? "" : obj.getProjectLabel());
     }
 
     public static IProjectRepositoryNode researchProjectNode(Project project) {
