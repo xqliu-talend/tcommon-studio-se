@@ -453,16 +453,16 @@ public final class ProjectManager {
                     if (object == null) {
                         return true;
                     }
-
-                    if (object.getId() != null && cachedObjects.containsKey(object.getId())) {
-                        return cachedObjects.get(object.getId());
+                    String key = getCacheKey(object);
+                    if (key != null && cachedObjects.containsKey(key)) {
+                        return cachedObjects.get(key);
                     }
 
                     org.talend.core.model.properties.Project emfProject = getProject(object.getProperty().getItem());
                     org.talend.core.model.properties.Project curProject = curP.getEmfProject();
                     boolean ret = emfProject.equals(curProject);
-                    if (object.getId() != null) {
-                        cachedObjects.put(object.getId(), ret);
+                    if (key != null) {
+                        cachedObjects.put(key, ret);
                     }
                     return ret;
 
@@ -492,6 +492,13 @@ public final class ProjectManager {
             }
         }
         return false;
+    }
+
+    private static String getCacheKey(IRepositoryViewObject obj) {
+        if (obj.getId() == null && obj.getProjectLabel() == null) {
+            return null;
+        }
+        return (obj.getId() == null ? "" : obj.getId()) + "-" + (obj.getProjectLabel() == null ? "" : obj.getProjectLabel());
     }
 
     public static IProjectRepositoryNode researchProjectNode(Project project) {
