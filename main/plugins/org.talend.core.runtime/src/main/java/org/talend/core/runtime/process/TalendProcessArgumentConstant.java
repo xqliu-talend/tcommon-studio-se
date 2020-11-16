@@ -58,6 +58,8 @@ public interface TalendProcessArgumentConstant {
 
     static final String ARG_BUILD_TYPE = "BUILD_TYPE";
 
+    static final String ARG_EXPORT_BUILD_TYPE = "EXPORT_BUILD_TYPE";
+
     static final String ARG_NEED_LAUNCHER = "NEED_LAUNCHER";
 
     static final String ARG_LAUNCHER_NAME = "LAUNCHER_NAME";
