@@ -265,6 +265,8 @@ public class DatabaseForm extends AbstractForm {
 
     private Button disableCBCProtection;
 
+    private LabelledText metastoreHost;
+
     private LabelledText metastorePort;
 
     /**
@@ -1547,6 +1549,7 @@ public class DatabaseForm extends AbstractForm {
         data.horizontalSpan = 3;
         hiveEnableHaBtn.setLayoutData(data);
 
+        metastoreHost = new LabelledText(hiveMetastoreGroup, Messages.getString("DatabaseForm.hiveThriftMetastore.host"), 2); //$NON-NLS-1$
         metastorePort = new LabelledText(hiveMetastoreGroup, Messages.getString("DatabaseForm.hiveThriftMetastore.port"), 2); //$NON-NLS-1$
         hiveMetastoreUrisTxt = new LabelledText(hiveMetastoreGroup, Messages.getString("DatabaseForm.hive.metastore.uris"), 2); //$NON-NLS-1$
     }
@@ -1869,9 +1872,11 @@ public class DatabaseForm extends AbstractForm {
             if (hiveEnableHaBtn.getSelection()) {
                 hiveMetastoreUrisTxt.show();
                 metastorePort.hide();
+                metastoreHost.hide();
             } else {
                 hiveMetastoreUrisTxt.hide();
                 metastorePort.show();
+                metastoreHost.show();
             }
         } else {
             hiveMetastoreGroup.setVisible(false);
@@ -4953,6 +4958,15 @@ public class DatabaseForm extends AbstractForm {
             }
         });
 
+        metastoreHost.addModifyListener(new ModifyListener() {
+
+            @Override
+            public void modifyText(ModifyEvent e) {
+                if (!isContextMode()) {
+                    getConnection().getParameters().put(ConnParameterKeys.CONN_PARA_KEY_HIVE_THRIFTHOST, metastoreHost.getText());
+                }
+            }
+        });
         metastorePort.addModifyListener(new ModifyListener() {
 
             @Override
@@ -6319,7 +6333,9 @@ public class DatabaseForm extends AbstractForm {
         updateCheckButtonStatus();
     }
 
-    private static String DEFAULT_HIVE_METASTORE_PORT = "9083";
+    private static String DEFAULT_HIVE_METASTORE_HOST = "localhost";//$NON-NLS-1$
+
+    private static String DEFAULT_HIVE_METASTORE_PORT = "9083";//$NON-NLS-1$
 
     /**
      * SetEditable fields.
@@ -6484,6 +6500,10 @@ public class DatabaseForm extends AbstractForm {
                 String metastoreport = getConnection().getParameters().get(ConnParameterKeys.CONN_PARA_KEY_HIVE_THRIFTPORT);
                 if (metastoreport == null || "".equals(metastoreport)) {
                     metastorePort.setText(DEFAULT_HIVE_METASTORE_PORT);
+                }
+                String metastorehost = getConnection().getParameters().get(ConnParameterKeys.CONN_PARA_KEY_HIVE_THRIFTHOST);
+                if (metastorehost == null || "".equals(metastorehost)) {
+                    metastoreHost.setText(DEFAULT_HIVE_METASTORE_HOST);
                 }
             }
             // schemaText.hide();
@@ -6815,6 +6835,7 @@ public class DatabaseForm extends AbstractForm {
             boolean isEnableHiveHa = hiveEnableHaBtn.getSelection();
             addContextParams(EDBParamName.hiveMetastoreUris, isEnableHiveHa);
             addContextParams(EDBParamName.HiveMetastorePort, !isEnableHiveHa);
+            addContextParams(EDBParamName.HiveMetastoreHost, !isEnableHiveHa);
 
             addContextParams(EDBParamName.Username, !useKerberos.getSelection() && useMaprTForHive.getSelection());
             addContextParams(EDBParamName.Maprticket_Password, !useKerberos.getSelection() && useMaprTForHive.getSelection());
@@ -7356,6 +7377,7 @@ public class DatabaseForm extends AbstractForm {
                 ConnParameterKeys.CONN_PARA_KEY_HIVE_ADDITIONAL_JDBC_SETTINGS);
         String hiveEnableHa = connection.getParameters().get(ConnParameterKeys.CONN_PARA_KEY_HIVE_ENABLE_HA);
         String hiveMetastoreUris = connection.getParameters().get(ConnParameterKeys.CONN_PARA_KEY_HIVE_METASTORE_URIS);
+        String metadatastoreHost = connection.getParameters().get(ConnParameterKeys.CONN_PARA_KEY_HIVE_THRIFTHOST);
         String metadatastorePort = connection.getParameters().get(ConnParameterKeys.CONN_PARA_KEY_HIVE_THRIFTPORT);
         boolean useSSL = Boolean.parseBoolean(connection.getParameters().get(ConnParameterKeys.CONN_PARA_KEY_USE_SSL));
         String trustStorePathStr = connection.getParameters().get(ConnParameterKeys.CONN_PARA_KEY_SSL_TRUST_STORE_PATH);
@@ -7377,6 +7399,7 @@ public class DatabaseForm extends AbstractForm {
         driverClassTxt.setText(driverClass == null ? "" : driverClass);
         usernameTxt.setText(username == null ? "" : username);
         passwordTxt.setText(password == null ? "" : password);
+        metastoreHost.setText(metadatastoreHost == null ? "" : metadatastoreHost);
         metastorePort.setText(metadatastorePort == null ? "" : metadatastorePort);
         additionalJDBCSettingsText.setText(additionalJDBCSettings == null ? "" : additionalJDBCSettings);
         hiveEnableHaBtn.setSelection(Boolean.valueOf(hiveEnableHa));
