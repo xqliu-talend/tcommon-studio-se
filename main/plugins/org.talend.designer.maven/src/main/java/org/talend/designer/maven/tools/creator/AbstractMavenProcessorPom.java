@@ -318,16 +318,15 @@ public abstract class AbstractMavenProcessorPom extends CreateMavenBundleTemplat
                 String type = null;
                 if (!jobInfo.isJoblet()) {
                     property = jobInfo.getProcessItem().getProperty();
-
                     artifactId = PomIdsHelper.getJobArtifactId(jobInfo);
                     
                     JobInfo lastMainJob = LastGenerationInfo.getInstance().getLastMainJob();
                     if (lastMainJob != null && JobUtils.isJob(jobInfo)) {
-                    	groupId = PomIdsHelper.getJobGroupId(lastMainJob.getProcessor().getProperty());
-                    	version =  PomIdsHelper.getJobVersion(lastMainJob.getProcessor().getProperty()); 
+                        groupId = PomIdsHelper.getJobGroupId(lastMainJob.getProcessor().getProperty());
+                        version =  PomIdsHelper.getJobVersion(lastMainJob.getProcessor().getProperty()); 
                     } else {
                         groupId = PomIdsHelper.getJobGroupId(property);	
-                    	version = PomIdsHelper.getJobVersion(property);
+                        version = PomIdsHelper.getJobVersion(property);
                     }
 
                     
