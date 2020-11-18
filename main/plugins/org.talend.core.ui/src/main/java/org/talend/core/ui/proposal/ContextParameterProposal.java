@@ -80,7 +80,7 @@ public class ContextParameterProposal implements IContentProposal {
         MessageFormat format = new MessageFormat(getDescriptionMessagePattern());
         if (contextParameter.getContext() != null) {
             Object[] replaceArgs = new Object[] { desc, contextParameter.getContext().getName(), contextParameter.getType(),
-                    contextParameter.getName() };
+                    contextParameter.getValue() };
             return format.format(replaceArgs);
         }
         return desc;
