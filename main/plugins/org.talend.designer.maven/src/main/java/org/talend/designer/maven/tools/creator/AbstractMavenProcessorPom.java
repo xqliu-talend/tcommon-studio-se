@@ -136,7 +136,7 @@ public abstract class AbstractMavenProcessorPom extends CreateMavenBundleTemplat
 
         Map<ETalendMavenVariables, String> variablesValuesMap = new HashMap<ETalendMavenVariables, String>();
         // no need check property is null or not, because if null, will get default ids.
-        JobInfo lastMainJob = LastGenerationInfo.getInstance().getLastMainJob();  
+        JobInfo lastMainJob = LastGenerationInfo.getInstance().getLastMainJob(); 
         if (JobUtils.isJob(property) && ProcessUtils.isChildRouteProcess(process) && lastMainJob != null) {
             variablesValuesMap.put(ETalendMavenVariables.JobGroupId, PomIdsHelper.getJobGroupId(lastMainJob.getProcessor().getProperty()));
             variablesValuesMap.put(ETalendMavenVariables.JobVersion, PomIdsHelper.getJobVersion(lastMainJob.getProcessor().getProperty()));	    	
@@ -318,16 +318,19 @@ public abstract class AbstractMavenProcessorPom extends CreateMavenBundleTemplat
                 String type = null;
                 if (!jobInfo.isJoblet()) {
                     property = jobInfo.getProcessItem().getProperty();
+
                     artifactId = PomIdsHelper.getJobArtifactId(jobInfo);
-                    JobInfo lastMainJob = LastGenerationInfo.getInstance().getLastMainJob(); 
-                    if (JobUtils.isJob(property) && lastMainJob != null) {
-                        version = PomIdsHelper.getJobVersion(lastMainJob.getProcessor().getProperty());
-                        groupId = PomIdsHelper.getJobGroupId(lastMainJob.getProcessor().getProperty());
+                    
+                    JobInfo lastMainJob = LastGenerationInfo.getInstance().getLastMainJob();
+                    if (lastMainJob != null && JobUtils.isJob(jobInfo)) {
+                    	groupId = PomIdsHelper.getJobGroupId(lastMainJob.getProcessor().getProperty());
+                    	version =  PomIdsHelper.getJobVersion(lastMainJob.getProcessor().getProperty()); 
                     } else {
-                        version = PomIdsHelper.getJobVersion(property);
-                        groupId = PomIdsHelper.getJobGroupId(property);                    	
+                        groupId = PomIdsHelper.getJobGroupId(property);	
+                    	version = PomIdsHelper.getJobVersion(property);
                     }
 
+                    
                     // try to get the pom version of children job and load from the pom file.
                     String childPomFileName = PomUtil.getPomFileName(jobInfo.getJobName(), jobInfo.getJobVersion());
                     IProject codeProject = getJobProcessor().getCodeProject();
