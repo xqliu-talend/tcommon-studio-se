@@ -318,10 +318,16 @@ public abstract class AbstractMavenProcessorPom extends CreateMavenBundleTemplat
                 String type = null;
                 if (!jobInfo.isJoblet()) {
                     property = jobInfo.getProcessItem().getProperty();
-                    groupId = PomIdsHelper.getJobGroupId(property);
                     artifactId = PomIdsHelper.getJobArtifactId(jobInfo);
+                    JobInfo lastMainJob = LastGenerationInfo.getInstance().getLastMainJob(); 
+                    if (JobUtils.isJob(property) && lastMainJob != null) {
+                        version = PomIdsHelper.getJobVersion(lastMainJob.getProcessor().getProperty());
+                        groupId = PomIdsHelper.getJobGroupId(lastMainJob.getProcessor().getProperty());
+                    } else {
+                        version = PomIdsHelper.getJobVersion(property);
+                        groupId = PomIdsHelper.getJobGroupId(property);                    	
+                    }
 
-                    version = PomIdsHelper.getJobVersion(property);
                     // try to get the pom version of children job and load from the pom file.
                     String childPomFileName = PomUtil.getPomFileName(jobInfo.getJobName(), jobInfo.getJobVersion());
                     IProject codeProject = getJobProcessor().getCodeProject();
